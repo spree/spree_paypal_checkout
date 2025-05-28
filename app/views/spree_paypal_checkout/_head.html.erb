@@ -1,0 +1,10 @@
+<% if current_store.paypal_checkout_gateway.present? %>
+  <!-- Initialize the JS-SDK -->
+  <script
+    src="https://www.paypal.com/sdk/js?client-id=<%= current_store.paypal_checkout_gateway.preferred_client_id %>&currency=<%= current_currency %>&components=buttons&enable-funding=venmo,paylater,card"
+    data-sdk-integration-source="developer-studio"
+    defer
+  ></script>
+
+  <%= javascript_import_module_tag 'application-spree-paypal-checkout' %>
+<% end %>

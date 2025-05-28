@@ -1,0 +1,13 @@
+<div
+  data-controller="checkout-paypal"
+  data-checkout-paypal-client-key-value="<%= current_paypal_checkout_gateway.try(:preferred_client_key) %>"
+  data-checkout-paypal-order-number-value="<%= @order.number %>"
+  data-checkout-paypal-order-token-value="<%= @order.token %>"
+  data-checkout-paypal-currency-value="<%= @order.currency %>"
+  data-checkout-paypal-amount-value="<%= @order.total %>"
+  data-checkout-paypal-api-create-order-path-value="<%= spree.api_v2_storefront_paypal_orders_path %>"
+  data-checkout-paypal-api-capture-order-path-value="<%= spree.capture_api_v2_storefront_paypal_order_path(@order.number) %>"
+  data-checkout-paypal-api-checkout-update-path-value="<%= spree.api_v2_storefront_checkout_path %>"
+  data-checkout-paypal-return-url-value="<%= spree.checkout_complete_path(@order.token) %>"
+>
+</div>
