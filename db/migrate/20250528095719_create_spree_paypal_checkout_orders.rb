@@ -1,10 +1,10 @@
 class CreateSpreePaypalCheckoutOrders < ActiveRecord::Migration[8.0]
   def change
     create_table :spree_paypal_checkout_orders do |t|
-      t.references :order, null: false, foreign_key: { to_table: :spree_orders }
-      t.string :paypal_order_id, null: false, index: { unique: true }
-      t.string :status, null: false
-      t.datetime :captured_at
+      t.references :order, null: false
+      t.references :payment_method, null: false
+      t.string :paypal_id, null: false
+      t.decimal :amount, null: false, precision: 10, scale: 2
 
       if t.respond_to? :jsonb
         t.jsonb :data
@@ -14,5 +14,7 @@ class CreateSpreePaypalCheckoutOrders < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+
+    add_index :spree_paypal_checkout_orders, [:order_id, :paypal_id], unique: true
   end
 end

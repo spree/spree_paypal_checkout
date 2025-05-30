@@ -14,8 +14,10 @@ module Spree
             paypal_response = paypal_client.orders.create_order(order_presenter.to_json)
 
             paypal_order = spree_current_order.paypal_checkout_orders.create!(
-              paypal_order_id: paypal_response.data.id,
-              data: paypal_response.data.as_json
+              paypal_id: paypal_response.data.id,
+              data: paypal_response.data.as_json,
+              amount: spree_current_order.total,
+              payment_method: current_store.paypal_checkout_gateway
             )
 
             render_serialized_payload { serialize_resource(paypal_order) }
@@ -25,19 +27,9 @@ module Spree
 
           # PUT /api/v2/storefront/paypal_orders/:id/capture
           def capture
-            paypal_order = spree_current_order.paypal_checkout_orders.find_by!(paypal_order_id: params[:id])
-
-            # capture the order in PayPal using the gateway
-            result = current_store.paypal_checkout_gateway.capture(
-              spree_current_order.total,
-              paypal_order.paypal_order_id,
-              { order_id: spree_current_order.number, paypal_order_id: paypal_order.paypal_order_id }
-            )
-
-            binding.pry
-
-            # flag the order as captured
+            paypal_order = spree_current_order.paypal_checkout_orders.find_by!(paypal_id: params[:id])
             paypal_order.capture!
+            paypal_order.reload
 
             render_serialized_payload { serialize_resource(paypal_order) }
           # rescue PaypalServerSdk::ErrorException => e

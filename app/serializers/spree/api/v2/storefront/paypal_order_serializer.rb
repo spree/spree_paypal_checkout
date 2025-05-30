@@ -3,7 +3,7 @@ module Spree
     module V2
       module Storefront
         class PaypalOrderSerializer < BaseSerializer
-          attributes :paypal_order_id, :status, :captured_at, :data
+          attributes :paypal_id, :data, :amount
         end
       end
     end
