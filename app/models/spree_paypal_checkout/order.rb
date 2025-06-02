@@ -32,20 +32,22 @@ module SpreePaypalCheckout
       CaptureOrder.new(paypal_order: self).call
     end
 
-    def billing_details
-      {
-        name: payer.dig('name', 'given_name') + ' ' + payer.dig('name', 'surname'),
-        email: payer['email_address'],
-        phone: payer.dig('phone', 'phone_number', 'national_number'),
-        address: {
-          address1: payer.dig('address', 'address_line_1'),
-          address2: payer.dig('address', 'address_line_2'),
-          city: payer.dig('address', 'admin_area_2'),
-          zipcode: payer.dig('address', 'postal_code'),
-          state: payer.dig('address', 'admin_area_1'),
-          country_iso: payer.dig('address', 'country_code')
-        }
-      }
+    # gets the PayPal payment ID from the PayPal order
+    # only available for authorized or captured orders
+    # @return [String]
+    def paypal_payment_id
+      # Get fresh data from PayPal API
+      response = paypal_order
+      return nil unless response&.data&.purchase_units&.first&.payments&.captures&.first
+
+      # Return the capture ID directly (e.g. "5UX50114VU009815S")
+      response.data.purchase_units.first.payments.captures.first.id
+    end
+
+    # gets the PayPal order from PayPal API
+    # @return [PaypalServerSdk::ApiResponse]
+    def paypal_order
+      @paypal_order ||= gateway.client.orders.get_order({ 'id' => paypal_id })
     end
   end
 end

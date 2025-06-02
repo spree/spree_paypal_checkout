@@ -17,7 +17,7 @@ module SpreePaypalCheckout
       # sometimes a job is re-tried and creates a double payment record so we need to avoid it!
       payment = order.payments.find_or_initialize_by(
         payment_method_id: gateway.id,
-        response_code: paypal_order.paypal_id,
+        response_code: paypal_order.paypal_payment_id,
         amount: amount
       )
 

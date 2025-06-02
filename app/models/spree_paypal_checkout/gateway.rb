@@ -84,6 +84,27 @@ module SpreePaypalCheckout
       raise 'Not implemented'
     end
 
+    def credit(amount_in_cents, _payment_source, paypal_payment_id, gateway_options = {})
+      refund_originator = gateway_options[:originator]
+      order = refund_originator.respond_to?(:order) ? refund_originator.order : refund_originator
+
+      return failure('Order not found') unless order
+
+      protect_from_error do
+        payload = {
+          capture_id: paypal_payment_id,
+          amount: {
+            value: (amount_in_cents / 100.0).to_s,
+            currency_code: order.currency.upcase
+          }
+        }.deep_stringify_keys
+
+        response = client.payments.refund_captured_payment(payload)
+
+        success(response.data.id, response.data.as_json)
+      end
+    end
+
     def cancel(authorization, payment = nil)
       raise 'Not implemented'
     end
@@ -110,7 +131,7 @@ module SpreePaypalCheckout
 
     def protect_from_error
       yield
-    # rescue PaypalServerSdk::ErrorException => e
+    # rescue PaypalServerSdk::APIException => e
     #   Rails.logger.error("PayPal error: #{e.message}")
     #   failure(e.message)
     # rescue StandardError => e

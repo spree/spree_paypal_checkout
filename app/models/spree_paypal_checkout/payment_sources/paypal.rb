@@ -4,7 +4,7 @@ module SpreePaypalCheckout
       store_accessor :public_metadata, :email, :name
 
       def actions
-        %w[credit]
+        %w[credit void]
       end
 
       def self.display_name
