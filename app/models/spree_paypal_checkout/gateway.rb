@@ -81,18 +81,20 @@ module SpreePaypalCheckout
     # @param paypal_id [String] the PayPal Order ID
     # @param gateway_options [Hash] this is an instance of Spree::Payment::GatewayOptions.to_hash
     def capture(amount_in_cents, paypal_id, gateway_options = {})
-      order = find_order(gateway_options[:order_id])
-      return failure('Order not found') unless order
+      protect_from_error do
+        order = find_order(gateway_options[:order_id])
+        return failure('Order not found') unless order
 
-      response = client.orders.capture_order({
-        'id' => paypal_id,
-        'prefer' => 'return=representation'
-      })
+        response = client.orders.capture_order({
+          'id' => paypal_id,
+          'prefer' => 'return=representation'
+        })
 
-      if response.data.status == 'COMPLETED'
-        success(response.data.id, response.data.as_json)
-      else
-        failure('Failed to capture PayPal payment', response.data)
+        if response.data.status == 'COMPLETED'
+          success(response.data.id, response.data.as_json)
+        else
+          failure('Failed to capture PayPal payment', response.data)
+        end
       end
     end
 
@@ -127,11 +129,6 @@ module SpreePaypalCheckout
 
     private
 
-    def handle_purchase_or_capture(amount_in_cents, payment_source, gateway_options)
-      # protect_from_error do
-      # end
-    end
-
     def find_order(order_id)
       return nil unless order_id
 
@@ -148,12 +145,9 @@ module SpreePaypalCheckout
 
     def protect_from_error
       yield
-    # rescue PaypalServerSdk::APIException => e
-    #   Rails.logger.error("PayPal error: #{e.message}")
-    #   failure(e.message)
-    # rescue StandardError => e
-    #   Rails.logger.error("PayPal error: #{e.message}")
-    #   failure(e.message)
+    rescue PaypalServerSdk::APIException => e
+      Rails.logger.error("PayPal error: #{e.message}")
+      failure(e.message)
     end
 
     def success(authorization, response)
