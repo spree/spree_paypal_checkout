@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import showFlashMessage from 'spree/storefront/helpers/show_flash_message'
+import { post, put } from '@rails/request.js'
 
 export default class extends Controller {
   static values = {
@@ -41,17 +42,14 @@ export default class extends Controller {
         amount: this.amountValue,
       },
       createOrder: async () => {
-        try {
-          const response = await fetch(this.apiCreateOrderPathValue, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Spree-Order-Token": this.orderTokenValue,
-            }
-          });
+        const response = await post(this.apiCreateOrderPathValue, {
+          headers: {
+            "X-Spree-Order-Token": this.orderTokenValue,
+          }
+        });
 
-          const paypalOrder = await response.json();
-          console.log('Full PayPal order response:', paypalOrder);
+        if (response.ok) {
+          const paypalOrder = await response.json;
 
           if (!paypalOrder.data) {
             console.error('No data in PayPal order response:', paypalOrder);
@@ -68,32 +66,27 @@ export default class extends Controller {
 
           // Make sure we're returning a string
           return String(orderId);
-        } catch (error) {
-          console.error('PayPal createOrder error:', error);
-          showFlashMessage('error', `Could not initiate PayPal Checkout...<br><br>${error.message}`);
-          throw error;
+        } else {
+          console.error('Failed to create PayPal order:', response.error);
+          showFlashMessage('error', `Sorry, your transaction could not be processed...<br><br>${response.error}`);
+          throw new Error(response.error || 'Failed to create PayPal order');
         }
       },
       onApprove: async (data, actions) => {
-        try {
-          const response = await fetch(
-            // we need to replace the order number with the PayPal order ID
-            this.apiCaptureOrderPathValue.replace(this.orderNumberValue, data.orderID),
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Spree-Order-Token": this.orderTokenValue,
-              },
-            }
-          );
+        const response = await put(
+          this.apiCaptureOrderPathValue.replace(this.orderNumberValue, data.orderID),
+          {
+            headers: {
+              "X-Spree-Order-Token": this.orderTokenValue,
+            },
+          }
+        );
 
-          const responseJson = await response.json();
-
-          window.location.href = this.returnUrlValue;
-        } catch (error) {
-          console.error(error);
-          showFlashMessage('error', `Sorry, your transaction could not be processed...<br><br>${error}`);
+        if (response.ok) {
+          window.location.href = this.returnUrlValue; 
+        } else {
+          console.error('Failed to capture PayPal order:', response.error);
+          showFlashMessage('error', `Sorry, your transaction could not be processed...<br><br>${response.error}`);
         }
       },
       onError: (err) => {
