@@ -16,6 +16,14 @@ module SpreePaypalCheckout
       self.class
     end
 
+    def payment_source_class
+      SpreePaypalCheckout::PaymentSources::Paypal
+    end
+
+    def payment_profiles_supported?
+      true
+    end
+
     def default_name
       'PayPal'
     end
@@ -30,6 +38,14 @@ module SpreePaypalCheckout
 
     def description_partial_name
       'spree_paypal_checkout'
+    end
+
+    def source_partial_name
+      'paypal_checkout'
+    end
+
+    def create_profile(_payment)
+      # we don't need to create a profile for PayPal users, everything is handled by PayPal
     end
 
     def client
@@ -57,7 +73,7 @@ module SpreePaypalCheckout
 
     # Purchase is the same as authorize + capture in one step
     def purchase(amount_in_cents, payment_source, gateway_options = {})
-      raise 'Not implemented'
+      capture(amount_in_cents, payment_source.paypal_id, gateway_options)
     end
 
     # Capture a previously authorized payment
@@ -118,6 +134,7 @@ module SpreePaypalCheckout
 
     def find_order(order_id)
       return nil unless order_id
+
       order_number, _payment_number = order_id.split('-')
       Spree::Order.find_by(number: order_number)
     end

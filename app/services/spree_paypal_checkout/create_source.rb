@@ -35,11 +35,18 @@ module SpreePaypalCheckout
     #   }
     # },
     def create_paypal_source
-      SpreePaypalCheckout::PaymentSources::Paypal.find_or_create_by!(
+      source = SpreePaypalCheckout::PaymentSources::Paypal.find_or_create_by!(
         payment_method: gateway,
         user: user,
         gateway_payment_profile_id: paypal_payment_source['paypal']['account_id']
       )
+      source.update!(
+        email: paypal_payment_source['paypal']['email_address'],
+        name: "#{paypal_payment_source['paypal']['name']['given_name']} #{paypal_payment_source['paypal']['name']['surname']}".strip,
+        account_id: paypal_payment_source['paypal']['account_id'],
+        account_status: paypal_payment_source['paypal']['account_status']
+      )
+      source
     end
   end
 end

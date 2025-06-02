@@ -1,0 +1,16 @@
+<% if source.is_a?(SpreePaypalCheckout::PaymentSources::Paypal) %>
+  <p class="mb-2">
+    <code><%= source.account_id %></code>
+    <% if source.account_status == 'VERIFIED' %>
+      <code class="text-success"><%= source.account_status %></code>
+    <% else %>
+      <code class="text-danger"><%= source.account_status %></code>
+    <% end %>
+  </p>
+  <p class="mb-0">
+    <%= source.email %>
+  </p>
+  <p class="mb-0">
+    <%= source.name %>
+  </p>
+<% end %>
