@@ -2,14 +2,16 @@ module SpreePaypalCheckout
   class Gateway < ::Spree::Gateway
     include PaypalServerSdk
 
+    #
+    # Preferences
+    #
     preference :client_id, :password
     preference :client_secret, :password
     preference :test_mode, :boolean, default: true
 
-    preference :venmo_enabled, :boolean, default: true
-    preference :paylater_enabled, :boolean, default: true
-    preference :card_enabled, :boolean, default: true
-
+    #
+    # Validations
+    #
     validates :preferred_client_id, :preferred_client_secret, presence: true
 
     def provider_class
@@ -44,8 +46,18 @@ module SpreePaypalCheckout
       'paypal_checkout'
     end
 
-    def create_profile(_payment)
-      # we don't need to create a profile for PayPal users, everything is handled by PayPal
+    def create_profile(payment)
+      user = payment.order.user
+      return if user.blank?
+
+      return if payment.source.blank?
+      return unless payment.source.is_a?(SpreePaypalCheckout::PaymentSources::Paypal)
+
+      paypal_account_id = payment.source.account_id
+
+      return if paypal_account_id.blank?
+
+      payment.payment_method.gateway_customers.find_or_create_by(user: user, profile_id: paypal_account_id)
     end
 
     def client

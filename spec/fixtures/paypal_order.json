@@ -1,0 +1,26 @@
+{
+  "id": "9DP54594E6135602P",
+  "status": "CREATED",
+  "links": [
+    {
+      "href": "https://api.sandbox.paypal.com/v2/checkout/orders/9DP54594E6135602P",
+      "rel": "self",
+      "method": "GET"
+    },
+    {
+      "href": "https://www.sandbox.paypal.com/checkoutnow?token=9DP54594E6135602P",
+      "rel": "approve",
+      "method": "GET"
+    },
+    {
+      "href": "https://api.sandbox.paypal.com/v2/checkout/orders/9DP54594E6135602P",
+      "rel": "update",
+      "method": "PATCH"
+    },
+    {
+      "href": "https://api.sandbox.paypal.com/v2/checkout/orders/9DP54594E6135602P/capture",
+      "rel": "capture",
+      "method": "POST"
+    }
+  ]
+}
