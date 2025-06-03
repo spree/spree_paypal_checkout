@@ -8,6 +8,15 @@ require File.expand_path('../dummy/config/environment.rb', __FILE__)
 require 'spree_dev_tools/rspec/spec_helper'
 require 'spree_paypal_checkout/factories'
 
+def json_response
+  case body = JSON.parse(response.body)
+  when Hash
+    body.with_indifferent_access
+  when Array
+    body
+  end
+end
+
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
 Dir[File.join(File.dirname(__FILE__), 'support/**/*.rb')].sort.each { |f| require f }

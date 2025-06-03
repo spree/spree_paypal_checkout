@@ -32,8 +32,8 @@ module Spree
             paypal_order.reload
 
             render_serialized_payload { serialize_resource(paypal_order) }
-          # rescue PaypalServerSdk::ErrorException => e
-            # render_error_payload(e.message)
+          rescue PaypalServerSdk::ErrorException => e
+            render_error_payload(e.message)
           end
 
           private
@@ -47,9 +47,9 @@ module Spree
           end
 
           def require_paypal_checkout_gateway
-            unless current_store.paypal_checkout_gateway.present?
-              render_error_payload('Paypal checkout gateway not found')
-            end
+            return if current_store.paypal_checkout_gateway.present?
+
+            render_error_payload('Paypal checkout gateway not found', :not_found) && return
           end
         end
       end
