@@ -1,0 +1,156 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api-m.sandbox.paypal.com/v1/oauth2/token
+    body:
+      encoding: UTF-8
+      string: grant_type=client_credentials
+    headers:
+      User-Agent:
+      - 'PayPal REST API Ruby SDK, Version: 1.1.0, on OS arm64-darwin23'
+      Authorization:
+      - "<FILTERED>"
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip,deflate
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - '30'
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Server:
+      - nginx
+      Access-Control-Expose-Headers:
+      - Server-Timing
+      Cache-Control:
+      - max-age=0, no-cache, no-store, must-revalidate
+      Paypal-Debug-Id:
+      - f546959a21171
+      Pragma:
+      - no-cache
+      Server-Timing:
+      - traceparent;desc="00-0000000000000000000f546959a21171-427b7b5e7def7846-01"
+      Traceparent:
+      - 00-0000000000000000000f546959a21171-a7b704de7253eca7-01
+      X-Paypal-Token-Service:
+      - IAAS
+      Http-X-Pp-Az-Locator:
+      - ccg18.slc
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Edge-Control:
+      - max-age=0
+      Accept-Ranges:
+      - none
+      Date:
+      - Wed, 04 Jun 2025 10:53:11 GMT
+      Via:
+      - 1.1 varnish
+      X-Served-By:
+      - cache-fra-eddf8230099-FRA
+      X-Cache:
+      - MISS
+      X-Cache-Hits:
+      - '0'
+      X-Timer:
+      - S1749034392.799814,VS0,VE178
+      Vary:
+      - Accept-Encoding
+      Content-Encoding:
+      - gzip
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        H4sIAAAAAAAEA42UTXPaMBCG/0rHx06MBdjQ+AYhIZQQAuX74hGyCEtsWejL0E7/e203ONMDdcYXWfOu3mdXu/plSZJwavnWXikufcfRAmocnzmOaiSJHUmFAUKlk+3FlCnp7LTSgl5+v1TFATMJEGCvlUqDdaQuPrZK3iiTjqA4rIwMQXKtMshcbW/1mYrKmEsCeUykIL5kVBlYmmkeYkVtSaMo88uqyKAatbR9XzhYqz3BPK/p562LPN+NuwIDU4JSf5EXsPKQkkDQnWYfxJj/c/Gm7vy9ECJoCMomWPxPW55a+3qNoJRki0QreU1XttzVhkgFqI9qfQLcuU5Vukm9lUQAV5CwajbMeQQEF2Inpdt9krxJ68bCJBsWGRTdm01Vp1HvdAbm+3g+PQ7uzEg9Tieo7fIHPj5MY7np9wzVs6dbsxlMTodw1V6sVoDSU+8eBvaz2cvNI9mON/OZtzhMh8c1NvdH/XPd6Y4XfWEQvGaWhVegzsUYdykWVOQgnAcQ5ggvLzZaNt1bt4Wehi5qI9d7yAT0xEFQGQCz/GYj+24sljCSvwUN1PBs1LKRO6sj36v7nru5izvucP0jXE2CfmNnwvTbKW4FRi5Xz/OmmntpL12OIBrtj4n1+w/7OtFHVwQAAA==
+  recorded_at: Wed, 04 Jun 2025 10:53:11 GMT
+- request:
+    method: post
+    uri: https://api-m.sandbox.paypal.com/v2/checkout/orders/non_existent_id/capture
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - 'PayPal REST API Ruby SDK, Version: 1.1.0, on OS arm64-darwin23'
+      Content-Type:
+      - application/json
+      Prefer:
+      - return=representation
+      Accept:
+      - application/json
+      Authorization:
+      - "<FILTERED>"
+      Accept-Encoding:
+      - gzip,deflate
+      Content-Length:
+      - '0'
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - '30'
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '459'
+      Content-Type:
+      - application/json
+      Server:
+      - nginx
+      Access-Control-Expose-Headers:
+      - Server-Timing
+      Cache-Control:
+      - max-age=0, no-cache, no-store, must-revalidate
+      Paypal-Debug-Id:
+      - f546959b496ea
+      Server-Timing:
+      - traceparent;desc="00-0000000000000000000f546959b496ea-a692b7d64660558f-01"
+      Traceparent:
+      - 00-0000000000000000000f546959b496ea-6fd67692e55c59bb-01
+      Http-X-Pp-Az-Locator:
+      - ccg18.slc
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Edge-Control:
+      - max-age=0
+      Accept-Ranges:
+      - bytes
+      Date:
+      - Wed, 04 Jun 2025 10:53:12 GMT
+      Via:
+      - 1.1 varnish
+      X-Served-By:
+      - cache-fra-eddf8230099-FRA
+      X-Cache:
+      - MISS
+      X-Cache-Hits:
+      - '0'
+      X-Timer:
+      - S1749034392.005295,VS0,VE305
+      Vary:
+      - Accept-Encoding
+    body:
+      encoding: UTF-8
+      string: '{"name":"RESOURCE_NOT_FOUND","details":[{"field":"order_id","value":"non_existent_id","location":"path","issue":"INVALID_RESOURCE_ID","description":"Specified
+        resource ID does not exist. Please check the resource ID and try again."}],"message":"The
+        specified resource does not exist.","debug_id":"f546959b496ea","links":[{"href":"https://developer.paypal.com/api/rest/reference/orders/v2/errors/#INVALID_RESOURCE_ID","rel":"information_link","method":"GET"}]}'
+  recorded_at: Wed, 04 Jun 2025 10:53:12 GMT
+recorded_with: VCR 6.3.1

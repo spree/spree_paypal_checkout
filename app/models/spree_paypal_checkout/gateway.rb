@@ -158,8 +158,7 @@ module SpreePaypalCheckout
     def protect_from_error
       yield
     rescue PaypalServerSdk::APIException => e
-      Rails.logger.error("PayPal error: #{e.message}")
-      failure(e.message)
+      raise Spree::Core::GatewayError, "PayPal API error: #{e.message}"
     end
 
     def success(authorization, response)

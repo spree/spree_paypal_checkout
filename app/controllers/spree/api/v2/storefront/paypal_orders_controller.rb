@@ -29,11 +29,8 @@ module Spree
           def capture
             paypal_order = spree_current_order.paypal_checkout_orders.find_by!(paypal_id: params[:id])
             paypal_order.capture!
-            paypal_order.reload
 
             render_serialized_payload { serialize_resource(paypal_order) }
-          rescue PaypalServerSdk::ErrorException => e
-            render_error_payload(e.message)
           end
 
           private

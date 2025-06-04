@@ -4,7 +4,8 @@ RSpec.describe Spree::Api::V2::Storefront::PaypalOrdersController, type: :reques
   let(:store) { create(:store) }
   let(:gateway) { create(:paypal_checkout_gateway, stores: [store]) }
   let(:user) { create(:user) }
-  let(:order) { create(:order_with_line_items, store: store, user: user) }
+  let(:address) { create(:address, user: user) }
+  let(:order) { create(:order_with_line_items, store: store, user: user, state: 'payment', ship_address: address, bill_address: address) }
   let(:headers) { { 'X-Spree-Order-Token' => order.token } }
 
   before do
@@ -44,22 +45,48 @@ RSpec.describe Spree::Api::V2::Storefront::PaypalOrdersController, type: :reques
     end
   end
 
-  xdescribe 'PUT /api/v2/storefront/paypal_orders/:id/capture' do
-    let(:paypal_order) { create(:paypal_checkout_order, order: order, payment_method: gateway) }
+  describe 'PUT /api/v2/storefront/paypal_orders/:id/capture' do
+    let(:paypal_order) { create(:paypal_checkout_order, order: order, payment_method: gateway, paypal_id: paypal_id) }
 
-    context 'when paypal order exists' do
-      it 'captures the paypal order', :vcr do
-        VCR.use_cassette('paypal/capture_order') do
-          expect {
-            put "/api/v2/storefront/paypal_orders/#{paypal_order.paypal_id}/capture"
-          }.to change { paypal_order.reload.captured? }.from(false).to(true)
+    context 'when paypal order record exists' do
+      context 'paypal ID is not found in PayPal API' do
+        let(:paypal_id) { 'non_existent_id' }
 
-          expect(response).to have_http_status(:ok)
+        it 'renders error', :vcr do
+          VCR.use_cassette('paypal/capture_order_not_found') do
+            put "/api/v2/storefront/paypal_orders/#{paypal_order.paypal_id}/capture", headers: headers
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(json_response['error']).to eq('PayPal API error: The specified resource does not exist.')
+          end
+        end
+      end
+
+      context 'paypal ID is found in PayPal API' do
+        let(:paypal_id) { '5RX55415GL5517636' } # id of a created and confirmed order (confirmed via PayPal JS SDK)
+
+        it "captures the order" do
+          gateway # create the gateway to make sure it's available in the cassette
+
+          VCR.use_cassette('paypal/capture_order') do
+            put "/api/v2/storefront/paypal_orders/#{paypal_order.paypal_id}/capture", headers: headers
+            expect(response).to have_http_status(:ok)
+
+            expect(json_response['data']['attributes']['paypal_id']).to eq(paypal_order.paypal_id)
+            expect(json_response['data']['attributes']['amount']).to eq(order.total.to_s)
+            expect(json_response['data']['attributes']['data']).to be_kind_of(Hash)
+
+            expect(order.reload.completed?).to be(true)
+            expect(order.payments.count).to eq(1)
+            expect(order.payments.first.state).to eq('completed')
+            expect(order.payments.first.amount).to eq(order.total)
+            expect(order.payments.first.payment_method).to eq(gateway)
+            expect(order.payments.first.source).to be_kind_of(SpreePaypalCheckout::PaymentSources::Paypal)
+          end
         end
       end
     end
 
-    context 'when paypal order does not exist' do
+    context 'when paypal order record does not exist' do
       it 'returns not found' do
         put '/api/v2/storefront/paypal_orders/non_existent_id/capture'
 

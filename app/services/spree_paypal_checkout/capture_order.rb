@@ -12,26 +12,22 @@ module SpreePaypalCheckout
     def call
       return paypal_order if order.completed? || order.canceled?
 
-      # check if the order has already been captured, can happen when retrying the capture
-      existing_payment = order.payments.find_by(response_code: paypal_order.paypal_id)
-      unless existing_payment.present? && existing_payment.completed?
-        # capture the order in PayPal API
-        gateway_response = gateway.capture(
-          Money.new(amount, order.currency).cents,
-          paypal_order.paypal_id,
-          {
-            order_id: order.number
-          }
-        )
+      # capture the order in PayPal API
+      gateway_response = gateway.capture(
+        Money.new(amount, order.currency).cents,
+        paypal_order.paypal_id,
+        {
+          order_id: order.number
+        }
+      )
 
+      order.with_lock do
         # gateway_response.params is a JSON response from PayPal APIs
-        paypal_order.update(data: gateway_response.params)
+        paypal_order.update!(data: gateway_response.params)
 
         # create the Spree::Payment record
         paypal_order.create_payment!
-      end
 
-      order.with_lock do
         # complete the order in Spree
         Spree::Dependencies.checkout_complete_service.constantize.call(order: order)
       end

@@ -1,0 +1,156 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api-m.sandbox.paypal.com/v1/oauth2/token
+    body:
+      encoding: UTF-8
+      string: grant_type=client_credentials
+    headers:
+      User-Agent:
+      - 'PayPal REST API Ruby SDK, Version: 1.1.0, on OS arm64-darwin23'
+      Authorization:
+      - "<FILTERED>"
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Accept:
+      - application/json
+      Accept-Encoding:
+      - gzip,deflate
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - '30'
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Server:
+      - nginx
+      Access-Control-Expose-Headers:
+      - Server-Timing
+      Cache-Control:
+      - max-age=0, no-cache, no-store, must-revalidate
+      Paypal-Debug-Id:
+      - f5070994b691d
+      Pragma:
+      - no-cache
+      Server-Timing:
+      - traceparent;desc="00-0000000000000000000f5070994b691d-3f7f89300d88eb93-01"
+      Traceparent:
+      - 00-0000000000000000000f5070994b691d-09b16d53179847f8-01
+      X-Paypal-Token-Service:
+      - IAAS
+      Http-X-Pp-Az-Locator:
+      - ccg18.slc
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Edge-Control:
+      - max-age=0
+      Accept-Ranges:
+      - none
+      Date:
+      - Wed, 04 Jun 2025 11:29:23 GMT
+      Via:
+      - 1.1 varnish
+      X-Served-By:
+      - cache-fra-eddf8230058-FRA
+      X-Cache:
+      - MISS
+      X-Cache-Hits:
+      - '0'
+      X-Timer:
+      - S1749036563.749399,VS0,VE522
+      Vary:
+      - Accept-Encoding
+      Content-Encoding:
+      - gzip
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        H4sIAAAAAAAEA42US3ObMBSF/0qHZSeYp81jh8t40tpJnJTEtTeMEMJWA5KqB9jJ9L8XaEymC5fsJOYcne9eXfGqCUgZ0kLtICUToWEojicMnBgoJ5BWhkC8xhAJo/1WISKFUSipODpvP435MKkphpjsR5U1UKU85+iSPiMiDI5APurMsWBKtpCdWs/UCfFRz7mAzlNKXJ0rGjUOYYrlQCJdoLJs89ouEjyOOsS+LQyg5AEC1vX049F9nW/Bcw4wkRyh8Klr4OghAwFHhSLvxID9c/G1Zfy9EMhRjqUOAf+fdjh18vkSwSBpF1RJcUk3jNzFgWg4lu/d+gC4cZlqSBMqE5BjJjEl42yAsRJD0IuNBmUHSp+FdqUB2D4WkfbT276qyLai6Nvp9rik+Kfnb/C+8L7melUd8kK5yfb4qK6R/qB+gen2Xq39RbFbJ/Kmpi7bLnZ+6Xq36qZuEvtl6y6/O2CeybT1xpsvAsR3CYjayD4rlaf+Gc8R4Ih3IIylOO8Q1mvd3Dhu4M7M1dI1PdOdLloBOjLMkUgx0ULH8r3ZlUYogd2/wDbtqW7OdNNNLCu0zdAJdr5y7344cRY3Ty+6+RBLQYNyn/lRvbX2j1mwuQ9KZ7G6blam9vsPWnjdaFcEAAA=
+  recorded_at: Wed, 04 Jun 2025 11:29:23 GMT
+- request:
+    method: post
+    uri: https://api-m.sandbox.paypal.com/v2/checkout/orders/5RX55415GL5517636/capture
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - 'PayPal REST API Ruby SDK, Version: 1.1.0, on OS arm64-darwin23'
+      Content-Type:
+      - application/json
+      Prefer:
+      - return=representation
+      Accept:
+      - application/json
+      Authorization:
+      - "<FILTERED>"
+      Accept-Encoding:
+      - gzip,deflate
+      Content-Length:
+      - '0'
+      Connection:
+      - keep-alive
+      Keep-Alive:
+      - '30'
+  response:
+    status:
+      code: 201
+      message: Created
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2530'
+      Content-Type:
+      - application/json
+      Server:
+      - nginx
+      Access-Control-Expose-Headers:
+      - Server-Timing
+      Cache-Control:
+      - max-age=0, no-cache, no-store, must-revalidate
+      Paypal-Debug-Id:
+      - f5070990e563f
+      Server-Timing:
+      - traceparent;desc="00-0000000000000000000f5070990e563f-8687c9ccf4801bf2-01"
+      Traceparent:
+      - 00-0000000000000000000f5070990e563f-27883446dec69274-01
+      Http-X-Pp-Az-Locator:
+      - ccg18.slc
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains
+      Edge-Control:
+      - max-age=0
+      Accept-Ranges:
+      - bytes
+      Date:
+      - Wed, 04 Jun 2025 11:29:24 GMT
+      Via:
+      - 1.1 varnish
+      X-Served-By:
+      - cache-fra-eddf8230058-FRA
+      X-Cache:
+      - MISS
+      X-Cache-Hits:
+      - '0'
+      X-Timer:
+      - S1749036563.302369,VS0,VE1124
+      Vary:
+      - Accept-Encoding
+    body:
+      encoding: UTF-8
+      string: '{"id":"5RX55415GL5517636","intent":"CAPTURE","status":"COMPLETED","payment_source":{"paypal":{"email_address":"sb-fxqy4743082799@personal.example.com","account_id":"RX8ZD67CZ67RU","account_status":"VERIFIED","name":{"given_name":"John","surname":"Doe"},"address":{"country_code":"US"}}},"purchase_units":[{"reference_id":"default","amount":{"currency_code":"USD","value":"86.99","breakdown":{"item_total":{"currency_code":"USD","value":"81.99"},"shipping":{"currency_code":"USD","value":"5.00"},"handling":{"currency_code":"USD","value":"0.00"},"tax_total":{"currency_code":"USD","value":"0.00"},"insurance":{"currency_code":"USD","value":"0.00"},"shipping_discount":{"currency_code":"USD","value":"0.00"},"discount":{"currency_code":"USD","value":"0.0"}}},"payee":{"email_address":"sb-r5l3i43078686@business.example.com","merchant_id":"46WGGQG979FMS"},"description":"Checked
+        Shirt","soft_descriptor":"PAYPAL *TEST STORE","items":[{"name":"Checked Shirt","unit_amount":{"currency_code":"USD","value":"81.99"},"tax":{"currency_code":"USD","value":"0.00"},"quantity":"1","sku":"CHECKED-SHIRT-S-RED","category":"PHYSICAL_GOODS"}],"shipping":{"name":{"full_name":"John
+        Doe"},"address":{"address_line_1":"1 Main St","admin_area_2":"San Jose","admin_area_1":"CA","postal_code":"95131","country_code":"US"}},"payments":{"captures":[{"id":"8NR94588EV696392P","status":"COMPLETED","amount":{"currency_code":"USD","value":"86.99"},"final_capture":true,"seller_protection":{"status":"ELIGIBLE","dispute_categories":["ITEM_NOT_RECEIVED","UNAUTHORIZED_TRANSACTION"]},"seller_receivable_breakdown":{"gross_amount":{"currency_code":"USD","value":"86.99"},"paypal_fee":{"currency_code":"USD","value":"3.53"},"net_amount":{"currency_code":"USD","value":"83.46"}},"links":[{"href":"https://api.sandbox.paypal.com/v2/payments/captures/8NR94588EV696392P","rel":"self","method":"GET"},{"href":"https://api.sandbox.paypal.com/v2/payments/captures/8NR94588EV696392P/refund","rel":"refund","method":"POST"},{"href":"https://api.sandbox.paypal.com/v2/checkout/orders/5RX55415GL5517636","rel":"up","method":"GET"}],"create_time":"2025-06-04T11:29:23Z","update_time":"2025-06-04T11:29:23Z"}]}}],"payer":{"name":{"given_name":"John","surname":"Doe"},"email_address":"sb-fxqy4743082799@personal.example.com","payer_id":"RX8ZD67CZ67RU","address":{"country_code":"US"}},"create_time":"2025-06-04T11:25:49Z","update_time":"2025-06-04T11:29:24Z","links":[{"href":"https://api.sandbox.paypal.com/v2/checkout/orders/5RX55415GL5517636","rel":"self","method":"GET"}]}'
+  recorded_at: Wed, 04 Jun 2025 11:29:24 GMT
+recorded_with: VCR 6.3.1
