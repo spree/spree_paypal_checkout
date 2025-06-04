@@ -42,6 +42,10 @@ module SpreePaypalCheckout
       'spree_paypal_checkout'
     end
 
+    def configuration_guide_partial_name
+      'spree_paypal_checkout'
+    end
+
     def source_partial_name
       'paypal_checkout'
     end
