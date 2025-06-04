@@ -58,4 +58,4 @@ If you'd like to contribute, please take a look at the
 [instructions](CONTRIBUTING.md) for installing dependencies and crafting a good
 pull request.
 
-Copyright (c) 2025 [name of extension creator], released under the New BSD License
+Copyright (c) 2025 Vendo Connect Inc, released under the AGPL-3.0 license

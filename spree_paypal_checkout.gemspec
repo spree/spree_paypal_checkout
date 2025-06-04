@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 3.0'
 
   s.author    = 'Vendo Connect Inc.'
-  s.email     = 'support@vendo.com'
+  s.email     = 'hello@spreecommerce.org'
   s.homepage  = 'https://github.com/spree/spree_paypal_checkout'
   s.license = 'AGPL-3.0-or-later'
 
