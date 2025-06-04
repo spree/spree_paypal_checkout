@@ -1,6 +1,14 @@
-# Spree Paypal checkout
+# Spree PayPal Checkout
 
-This is a Paypal checkout extension for [Spree Commerce](https://spreecommerce.org), an open source e-commerce platform built with Ruby on Rails.
+This is the official PayPal Checkout extension for [Spree Commerce](https://spreecommerce.org).
+
+This PayPal Checkout integration is bundled in the [Spree Starter](https://github.com/spree/spree_starter/) for your development convenience.
+
+Or you could follow the [installation instructions](https://spreecommerce.org/docs/integrations/payments/paypal).
+
+If you like what you see, consider giving this repo a GitHub star :star:
+
+Thank you for supporting Spree open-source :heart:
 
 ## Installation
 
