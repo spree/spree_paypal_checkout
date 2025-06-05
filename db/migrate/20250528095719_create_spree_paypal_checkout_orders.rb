@@ -1,4 +1,4 @@
-class CreateSpreePaypalCheckoutOrders < ActiveRecord::Migration[8.0]
+class CreateSpreePaypalCheckoutOrders < ActiveRecord::Migration[7.2]
   def change
     create_table :spree_paypal_checkout_orders do |t|
       t.references :order, null: false
