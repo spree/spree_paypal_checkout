@@ -40,7 +40,7 @@ module SpreePaypalCheckout
               ),
               items: order.line_items.map do |line_item|
                 Item.new(
-                  name: line_item.name,
+                  name: line_item.name[0...127],
                   unit_amount: Money.new(
                     currency_code: order.currency.upcase,
                     value: line_item.price.to_s
