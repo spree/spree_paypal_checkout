@@ -4,6 +4,8 @@ module SpreePaypalCheckout
   class OrderPresenter
     include PaypalServerSdk
 
+    PAYPAL_ITEM_NAME_MAX_LENGTH = 127
+
     def initialize(order)
       @order = order
     end
@@ -40,7 +42,7 @@ module SpreePaypalCheckout
               ),
               items: order.line_items.map do |line_item|
                 Item.new(
-                  name: line_item.name,
+                  name: line_item.name.to_s[0...PAYPAL_ITEM_NAME_MAX_LENGTH],
                   unit_amount: Money.new(
                     currency_code: order.currency.upcase,
                     value: line_item.price.to_s
