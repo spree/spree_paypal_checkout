@@ -37,9 +37,8 @@ RSpec.describe SpreePaypalCheckout::OrderPresenter do
         item
       }
       it "handles nil without raising" do
-        subject.to_json['body'].purchase_units[0].items.first
         expect { subject.to_json['body'].purchase_units[0].items.first }.not_to raise_error
-        expect(subject.to_json['body'].purchase_units[0].items.first.name).to be_nil.or eq("")
+        expect(subject.to_json['body'].purchase_units[0].items.first.name).to eq("")
       end
     end
   end
