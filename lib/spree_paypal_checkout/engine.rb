@@ -14,8 +14,10 @@ module SpreePaypalCheckout
     end
 
     initializer 'spree_paypal_checkout.assets' do |app|
-      app.config.assets.paths << root.join('app/javascript')
-      app.config.assets.precompile += %w[spree_paypal_checkout_manifest]
+      if app.config.respond_to?(:assets)
+        app.config.assets.paths << root.join('app/javascript')
+        app.config.assets.precompile += %w[spree_paypal_checkout_manifest]
+      end
     end
 
     initializer 'spree_paypal_checkout.importmap', before: 'importmap' do |app|
