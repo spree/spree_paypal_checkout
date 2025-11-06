@@ -1,6 +1,6 @@
 module SpreePaypalCheckout
   module PaymentMethodDecorator
-    PAYPAL_CHECKOUT_TYPE = 'SpreePaypalCheckout::Gateway'.freeze
+    PAYPAL_CHECKOUT_TYPE = 'SpreePaypalCheckout::Gateway'.freeze unless defined?(PAYPAL_CHECKOUT_TYPE)
 
     def self.prepended(base)
       base.scope :paypal_checkout, -> { where(type: PAYPAL_CHECKOUT_TYPE) }
