@@ -36,7 +36,7 @@ module SpreePaypalCheckout
                   ),
                   discount: Money.new(
                     currency_code: order.currency.upcase,
-                    value: order.promo_total.to_s
+                    value: (order.promo_total || 0).abs.to_s
                   )
                 )
               ),
