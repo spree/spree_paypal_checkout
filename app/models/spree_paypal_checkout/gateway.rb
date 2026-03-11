@@ -114,8 +114,15 @@ module SpreePaypalCheckout
       end
     end
 
-    def void(authorization, source, gateway_options = {})
-      raise 'Not implemented'
+    def void(authorization, _source, gateway_options = {})
+      protect_from_error do
+        response = client.payments.void_payment({
+          'authorization_id' => authorization,
+          'prefer' => 'return=representation'
+        })
+
+        success(authorization, response.data.as_json)
+      end
     end
 
     def credit(amount_in_cents, _payment_source, paypal_payment_id, gateway_options = {})
@@ -140,7 +147,27 @@ module SpreePaypalCheckout
     end
 
     def cancel(authorization, payment = nil)
-      raise 'Not implemented'
+      protect_from_error do
+        if payment&.completed?
+          amount = payment.credit_allowed
+          return success(authorization, {}) if amount.zero?
+
+          refund = payment.refunds.create!(
+            amount: amount,
+            reason: Spree::RefundReason.order_canceled_reason,
+            refunder_id: payment.order.canceler_id
+          )
+
+          success(payment.response_code, refund.response.params)
+        else
+          response = client.payments.void_payment({
+            'authorization_id' => authorization,
+            'prefer' => 'return=representation'
+          })
+
+          success(authorization, response.data.as_json)
+        end
+      end
     end
 
     private
@@ -166,7 +193,7 @@ module SpreePaypalCheckout
     end
 
     def success(authorization, response)
-      ActiveMerchant::Billing::Response.new(
+      payment_response_class.new(
         true,
         'Transaction successful',
         response,
@@ -175,11 +202,15 @@ module SpreePaypalCheckout
     end
 
     def failure(message, response = {})
-      ActiveMerchant::Billing::Response.new(
+      payment_response_class.new(
         false,
         message,
         response
       )
+    end
+
+    def payment_response_class
+      defined?(Spree::PaymentResponse) ? Spree::PaymentResponse : ::ActiveMerchant::Billing::Response
     end
   end
 end
