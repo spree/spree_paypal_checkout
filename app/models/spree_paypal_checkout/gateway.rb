@@ -2,6 +2,10 @@ module SpreePaypalCheckout
   class Gateway < ::Spree::Gateway
     include PaypalServerSdk
 
+    GatewayResponse = Struct.new(:success, :message, :params, :authorization) do
+      alias_method :success?, :success
+    end
+
     #
     # Preferences
     #
@@ -166,20 +170,11 @@ module SpreePaypalCheckout
     end
 
     def success(authorization, response)
-      ActiveMerchant::Billing::Response.new(
-        true,
-        'Transaction successful',
-        response,
-        authorization: authorization
-      )
+      GatewayResponse.new(true, 'Transaction successful', response, authorization)
     end
 
     def failure(message, response = {})
-      ActiveMerchant::Billing::Response.new(
-        false,
-        message,
-        response
-      )
+      GatewayResponse.new(false, message, response, nil)
     end
   end
 end
