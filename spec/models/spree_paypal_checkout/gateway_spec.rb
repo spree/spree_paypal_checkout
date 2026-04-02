@@ -182,7 +182,7 @@ RSpec.describe SpreePaypalCheckout::Gateway do
       it 'returns a successful billing response' do
         result = gateway.capture(1000, paypal_id, gateway_options)
 
-        expect(result).to be_a(Spree::PaymentResponse)
+        expect(result).to be_a(SpreePaypalCheckout::Gateway::GatewayResponse)
         expect(result.success?).to be true
         expect(result.authorization).to eq(paypal_id)
       end
@@ -201,7 +201,7 @@ RSpec.describe SpreePaypalCheckout::Gateway do
       it 'returns a failure response' do
         result = gateway.capture(1000, paypal_id, gateway_options)
 
-        expect(result).to be_a(Spree::PaymentResponse)
+        expect(result).to be_a(SpreePaypalCheckout::Gateway::GatewayResponse)
         expect(result.success?).to be false
         expect(result.message).to eq('Failed to capture PayPal payment')
       end
@@ -211,7 +211,7 @@ RSpec.describe SpreePaypalCheckout::Gateway do
       it 'returns a failure response' do
         result = gateway.capture(1000, paypal_id, { order_id: 'NONEXISTENT-123' })
 
-        expect(result).to be_a(Spree::PaymentResponse)
+        expect(result).to be_a(SpreePaypalCheckout::Gateway::GatewayResponse)
         expect(result.success?).to be false
         expect(result.message).to eq('Order not found')
       end
@@ -251,7 +251,7 @@ RSpec.describe SpreePaypalCheckout::Gateway do
     it 'returns a successful billing response' do
       result = gateway.void(authorization, nil)
 
-      expect(result).to be_a(Spree::PaymentResponse)
+      expect(result).to be_a(SpreePaypalCheckout::Gateway::GatewayResponse)
       expect(result.success?).to be true
       expect(result.authorization).to eq(authorization)
     end
@@ -297,7 +297,7 @@ RSpec.describe SpreePaypalCheckout::Gateway do
     it 'returns a successful billing response with the refund ID' do
       result = gateway.credit(1000, nil, capture_id, gateway_options)
 
-      expect(result).to be_a(Spree::PaymentResponse)
+      expect(result).to be_a(SpreePaypalCheckout::Gateway::GatewayResponse)
       expect(result.success?).to be true
       expect(result.authorization).to eq(refund_id)
     end
