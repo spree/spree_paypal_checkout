@@ -1,6 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
-import showFlashMessage from 'spree/storefront/helpers/show_flash_message'
 import { post, put } from '@rails/request.js'
+import showFlashMessage from 'spree/storefront/helpers/show_flash_message'
 
 export default class extends Controller {
   static values = {
@@ -16,21 +16,35 @@ export default class extends Controller {
   }
 
   connect() {
-    this.initPayPal();
-
     this.submitTarget = document.querySelector('#checkout-payment-submit')
     this.billingAddressCheckbox = document.querySelector('#order_use_shipping')
     this.billingAddressForm = document.querySelector('form.edit_order')
 
     // hide submit button
     this.submitTarget.style.display = 'none'
+
+    try {
+      this.initPayPal();
+    } catch (error) {
+      console.error('Failed to initialize PayPal:', error);
+      this.showPayPalError();
+    }
   }
 
   disconnect() {
     this.submitTarget.style.display = 'block'
   }
 
+  showPayPalError() {
+    showFlashMessage('Failed to load PayPal. Please contact support or try a different payment method.', 'error');
+  }
+
   initPayPal() {
+    // Check if PayPal SDK is loaded
+    if (typeof window.paypal === 'undefined') {
+      throw new Error('PayPal SDK not loaded');
+    }
+
     const paypalButtons = window.paypal.Buttons({
       style: {
         shape: "rect",
@@ -68,7 +82,7 @@ export default class extends Controller {
           return String(orderId);
         } else {
           console.error('Failed to create PayPal order:', response.error);
-          showFlashMessage('error', `Sorry, your transaction could not be processed...<br><br>${response.error}`);
+          showFlashMessage(`Sorry, your transaction could not be processed...<br><br>${response.error}`, 'error');
           throw new Error(response.error || 'Failed to create PayPal order');
         }
       },
@@ -83,17 +97,21 @@ export default class extends Controller {
         );
 
         if (response.ok) {
-          window.location.href = this.returnUrlValue; 
+          window.location.href = this.returnUrlValue;
         } else {
           console.error('Failed to capture PayPal order:', response.error);
-          showFlashMessage('error', `Sorry, your transaction could not be processed...<br><br>${response.error}`);
+          showFlashMessage(`Sorry, your transaction could not be processed...<br><br>${response.error}`, 'error');
         }
       },
       onError: (err) => {
-        showFlashMessage('error', `Your transaction was cancelled...<br><br>${err}`);
+        showFlashMessage(`Your transaction was cancelled...<br><br>${err}`, 'error');
       }
     });
 
-    paypalButtons.render(this.element);
+    // Render PayPal buttons - catch any rendering errors
+    paypalButtons.render(this.element).catch((error) => {
+      console.error('PayPal buttons render failed:', error);
+      this.showPayPalError();
+    });
   }
-}
+};
