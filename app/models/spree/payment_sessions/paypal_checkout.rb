@@ -24,14 +24,18 @@ module Spree
       accepted?
     end
 
+    # Creates or finds the Spree::Payment for this session.
+    # Defers creation until paypal_capture_id is present so response_code
+    # is always the capture ID (required for refunds via Gateway#credit).
     def find_or_create_payment!(metadata = {})
       return unless persisted?
       return payment if payment.present?
+      return unless paypal_capture_id
 
       order.with_lock do
         existing_payment = order.payments.where(
           payment_method: payment_method,
-          response_code: paypal_capture_id || external_id
+          response_code: paypal_capture_id
         ).first
 
         return existing_payment if existing_payment.present?
@@ -41,7 +45,7 @@ module Spree
         order.payments.create!(
           payment_method: payment_method,
           amount: amount,
-          response_code: paypal_capture_id || external_id,
+          response_code: paypal_capture_id,
           source: source,
           skip_source_requirement: true
         )

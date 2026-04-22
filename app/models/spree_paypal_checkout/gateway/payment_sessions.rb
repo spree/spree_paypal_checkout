@@ -20,19 +20,21 @@ module SpreePaypalCheckout
 
         return nil if total.zero?
 
-        order_presenter = SpreePaypalCheckout::OrderPresenter.new(order)
-        paypal_response = client.orders.create_order(order_presenter.to_json)
+        protect_from_error do
+          order_presenter = SpreePaypalCheckout::OrderPresenter.new(order)
+          paypal_response = client.orders.create_order(order_presenter.to_json)
 
-        payment_session_class.create!(
-          order: order,
-          payment_method: self,
-          amount: total,
-          currency: order.currency,
-          status: 'pending',
-          external_id: paypal_response.data.id,
-          customer: order.user,
-          external_data: paypal_response.data.as_json
-        )
+          payment_session_class.create!(
+            order: order,
+            payment_method: self,
+            amount: total,
+            currency: order.currency,
+            status: 'pending',
+            external_id: paypal_response.data.id,
+            customer: order.user,
+            external_data: paypal_response.data.as_json
+          )
+        end
       end
 
       def update_payment_session(payment_session:, amount: nil, external_data: {})
@@ -59,9 +61,10 @@ module SpreePaypalCheckout
           'prefer' => 'return=representation'
         })
 
-        payment_session.order.with_lock do
-          payment_session.update!(external_data: response.data.as_json)
+        # Persist capture data outside the lock so it survives if post-capture bookkeeping fails
+        payment_session.update!(external_data: response.data.as_json)
 
+        payment_session.order.with_lock do
           if response.data.status == 'COMPLETED'
             payment_session.process if payment_session.can_process?
 
@@ -127,7 +130,12 @@ module SpreePaypalCheckout
       end
 
       def verify_webhook_signature!(raw_body, headers)
-        return if preferred_webhook_secret.blank?
+        if preferred_webhook_secret.blank?
+          return if Rails.env.development? || Rails.env.test?
+
+          raise Spree::PaymentMethod::WebhookSignatureError,
+                'PayPal webhook_secret is not configured'
+        end
 
         transmission_id = headers['HTTP_PAYPAL_TRANSMISSION_ID'] || headers['PAYPAL-TRANSMISSION-ID']
         transmission_time = headers['HTTP_PAYPAL_TRANSMISSION_TIME'] || headers['PAYPAL-TRANSMISSION-TIME']
@@ -156,6 +164,8 @@ module SpreePaypalCheckout
 
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
+        http.open_timeout = 5
+        http.read_timeout = 10
         request = Net::HTTP::Post.new(uri.path, {
           'Content-Type' => 'application/json',
           'Authorization' => "Bearer #{token}"
@@ -170,7 +180,7 @@ module SpreePaypalCheckout
         end
       rescue Spree::PaymentMethod::WebhookSignatureError
         raise
-      rescue StandardError => e
+      rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, JSON::ParserError, Errno::ECONNREFUSED => e
         raise Spree::PaymentMethod::WebhookSignatureError, "Webhook verification failed: #{e.message}"
       end
 
@@ -180,6 +190,8 @@ module SpreePaypalCheckout
 
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
+        http.open_timeout = 5
+        http.read_timeout = 10
         request = Net::HTTP::Post.new(uri.path, { 'Content-Type' => 'application/x-www-form-urlencoded' })
         request.basic_auth(preferred_client_id, preferred_client_secret)
         request.body = 'grant_type=client_credentials'

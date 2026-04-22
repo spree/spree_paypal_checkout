@@ -84,5 +84,13 @@ RSpec.describe Spree::PaymentSessions::PaypalCheckout do
         expect(payment.source).to be_nil
       end
     end
+
+    context 'when capture has not happened yet' do
+      let(:session) { create(:paypal_checkout_payment_session, order: order, payment_method: gateway) }
+
+      it 'returns nil' do
+        expect(session.find_or_create_payment!).to be_nil
+      end
+    end
   end
 end
