@@ -4,6 +4,12 @@ module SpreePaypalCheckout
     isolate_namespace Spree
     engine_name 'spree_paypal_checkout'
 
+    # Only load API v2 controllers and serializers when spree_legacy_api_v2 gem is available
+    if defined?(SpreeLegacyApiV2::Engine)
+      config.autoload_paths << root.join('lib', 'spree_api_v2')
+      config.eager_load_paths << root.join('lib', 'spree_api_v2')
+    end
+
     # use rspec for tests
     config.generators do |g|
       g.test_framework :rspec
