@@ -47,7 +47,8 @@ module Spree
           amount: amount,
           response_code: paypal_capture_id,
           source: source,
-          skip_source_requirement: true
+          skip_source_requirement: true,
+          private_metadata: metadata
         )
       end
     end
