@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "mcp__*",
+      "mcp__claude_ai_Spree_Commerce_Docs_MCP__search_spree_commerce_documentation",
+      "mcp__claude_ai_Spree_Commerce_Docs_MCP__query_docs_filesystem_spree_commerce_documentation"
+    ],
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~/*)",
+      "Bash(chmod 777 *)",
+      "Read(~/.ssh/*)",
+      "Read(~/.gnupg/*)",
+      "Read(~/.aws/*)",
+      "Read(~/.config/gcloud/*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/secrets/*)",
+      "Read(**/*credential*)",
+      "Read(**/*password*)",
+      "Edit(~/.ssh/*)",
+      "Edit(~/.gnupg/*)",
+      "Edit(~/.aws/*)",
+      "Write(~/.ssh/*)",
+      "Write(~/.gnupg/*)",
+      "Write(~/.aws/*)"
+    ]
+  }
+}
