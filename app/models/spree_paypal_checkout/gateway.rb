@@ -1,6 +1,7 @@
 module SpreePaypalCheckout
   class Gateway < ::Spree::Gateway
     include PaypalServerSdk
+    include PaymentSessions
 
     GatewayResponse = Struct.new(:success, :message, :params, :authorization) do
       alias_method :success?, :success
@@ -11,6 +12,7 @@ module SpreePaypalCheckout
     #
     preference :client_id, :password
     preference :client_secret, :password
+    preference :webhook_secret, :string
     preference :test_mode, :boolean, default: true
 
     #
@@ -52,6 +54,13 @@ module SpreePaypalCheckout
 
     def source_partial_name
       'paypal_checkout'
+    end
+
+    def webhook_url
+      store = stores.first
+      return nil unless store
+
+      "#{store.formatted_url}/api/v3/webhooks/payments/#{prefixed_id}"
     end
 
     def create_profile(payment)

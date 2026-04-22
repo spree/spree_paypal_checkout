@@ -20,6 +20,21 @@ FactoryBot.define do
     gateway_customer_profile_id { 'PAY-CUSTOMER-ID' }
   end
 
+  factory :paypal_checkout_payment_session, class: 'Spree::PaymentSessions::PaypalCheckout' do
+    association :order, factory: :order
+    association :payment_method, factory: :paypal_checkout_gateway
+    amount { order.total }
+    currency { order.currency }
+    status { 'pending' }
+    external_id { "PAYPAL-ORDER-#{SecureRandom.hex(8).upcase}" }
+    external_data { JSON.parse(File.read(SpreePaypalCheckout::Engine.root.join('spec', 'fixtures', 'paypal_order.json'))) }
+
+    factory :completed_paypal_checkout_payment_session do
+      status { 'completed' }
+      external_data { JSON.parse(File.read(SpreePaypalCheckout::Engine.root.join('spec', 'fixtures', 'captured_paypal_order.json'))) }
+    end
+  end
+
   factory :paypal_checkout_order, class: 'SpreePaypalCheckout::Order' do
     paypal_id { 'PAY-ORDER-ID' }
     order { create(:order) }
