@@ -75,6 +75,45 @@ RSpec.describe Spree::PaymentSessions::PaypalCheckout do
       expect { session.find_or_create_payment! }.not_to change(Spree::Payment, :count)
     end
 
+    context 'when guest checks out then signs in (user changes)' do
+      let(:guest_order) { create(:order_with_line_items, store: store, user: nil) }
+      let(:session) { create(:paypal_checkout_payment_session, order: guest_order, payment_method: gateway, external_data: captured_data) }
+
+      it 'creates a payment source without a user' do
+        payment = session.find_or_create_payment!
+        expect(payment.source).to be_a(SpreePaypalCheckout::PaymentSources::Paypal)
+        expect(payment.source.user).to be_nil
+      end
+
+      it 'reuses the same payment source when user is later associated' do
+        # First checkout as guest
+        payment = session.find_or_create_payment!
+        source = payment.source
+
+        # Simulate guest signing in - order now has a user
+        guest_order.update!(user: user)
+
+        # New session for a second order by the now-signed-in user
+        second_order = create(:order_with_line_items, store: store, user: user)
+        second_session = create(:paypal_checkout_payment_session, order: second_order, payment_method: gateway, external_data: captured_data)
+
+        second_payment = second_session.find_or_create_payment!
+        expect(second_payment.source).to eq(source)
+        expect(second_payment.source.user).to eq(user)
+      end
+
+      it 'does not raise a uniqueness violation when user changes' do
+        # First checkout as guest
+        session.find_or_create_payment!
+
+        # Second checkout with a user using the same PayPal account
+        user_order = create(:order_with_line_items, store: store, user: user)
+        user_session = create(:paypal_checkout_payment_session, order: user_order, payment_method: gateway, external_data: captured_data)
+
+        expect { user_session.find_or_create_payment! }.not_to raise_error
+      end
+    end
+
     context 'when payment_source data is not present' do
       let(:session) { create(:paypal_checkout_payment_session, order: order, payment_method: gateway, external_data: captured_data.except('payment_source')) }
 

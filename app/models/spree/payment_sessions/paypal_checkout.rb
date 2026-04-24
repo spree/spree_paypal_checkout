@@ -61,10 +61,10 @@ module Spree
 
       source = SpreePaypalCheckout::PaymentSources::Paypal.find_or_initialize_by(
         payment_method: payment_method,
-        user: order.user,
         gateway_payment_profile_id: paypal_data['account_id']
       )
       source.update!(
+        user: order.user,
         email: paypal_data['email_address'],
         name: "#{paypal_data.dig('name', 'given_name')} #{paypal_data.dig('name', 'surname')}".strip,
         account_id: paypal_data['account_id'],
