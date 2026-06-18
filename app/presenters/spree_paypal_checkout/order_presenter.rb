@@ -30,17 +30,6 @@ module SpreePaypalCheckout
                     currency_code: order.currency.upcase,
                     value: order.ship_total.to_s
                   ),
-                  # PayPal requires amount.value == item_total + tax_total +
-                  # shipping - discount, and item_total == Σ(items.unit_amount).
-                  # For tax-INCLUSIVE stores (e.g. UK/EU VAT) the VAT is already
-                  # baked into the gross line prices (item_total / unit_amount),
-                  # so sending order.tax_total here (which includes that same VAT)
-                  # double-counts it and PayPal rejects the order with
-                  # UNPROCESSABLE_ENTITY / AMOUNT_MISMATCH. Only ADDITIONAL
-                  # (tax-exclusive) tax is added on top of the item prices, so
-                  # that is what belongs in the breakdown. For tax-exclusive
-                  # stores included_tax_total is 0, so additional_tax_total ==
-                  # tax_total and behaviour is unchanged.
                   tax_total: Money.new(
                     currency_code: order.currency.upcase,
                     value: order.additional_tax_total.to_s
