@@ -24,6 +24,15 @@ module SpreePaypalCheckout
           order_presenter = SpreePaypalCheckout::OrderPresenter.new(order)
           paypal_response = client.orders.create_order(order_presenter.to_json)
 
+          session_data = paypal_response.data.as_json
+
+          # Card Fields (advanced card processing) need a client token to render
+          # the hosted card inputs, so the storefront can initialise the PayPal
+          # SDK with `dataClientToken`. Generated alongside the order; failure is
+          # non-fatal — the PayPal wallet button still works without it.
+          client_token = generate_client_token
+          session_data['client_token'] = client_token if client_token.present?
+
           payment_session_class.create!(
             order: order,
             payment_method: self,
@@ -32,7 +41,7 @@ module SpreePaypalCheckout
             status: 'pending',
             external_id: paypal_response.data.id,
             customer: order.user,
-            external_data: paypal_response.data.as_json
+            external_data: session_data
           )
         end
       end
@@ -149,7 +158,6 @@ module SpreePaypalCheckout
 
         token = obtain_access_token
 
-        api_base = preferred_test_mode ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com'
         uri = URI("#{api_base}/v1/notifications/verify-webhook-signature")
 
         payload = {
@@ -185,7 +193,6 @@ module SpreePaypalCheckout
       end
 
       def obtain_access_token
-        api_base = preferred_test_mode ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com'
         uri = URI("#{api_base}/v1/oauth2/token")
 
         http = Net::HTTP.new(uri.host, uri.port)
@@ -198,6 +205,36 @@ module SpreePaypalCheckout
 
         response = http.request(request)
         JSON.parse(response.body)['access_token']
+      end
+
+      # Generates a short-lived client token for the JS SDK so the storefront
+      # can render PayPal Card Fields (advanced card processing). Returns nil on
+      # any failure — callers treat the token as optional (wallet still works).
+      def generate_client_token
+        token = obtain_access_token
+        return nil if token.blank?
+
+        uri = URI("#{api_base}/v1/identity/generate-token")
+
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        http.open_timeout = 5
+        http.read_timeout = 10
+        request = Net::HTTP::Post.new(uri.path, {
+          'Content-Type' => 'application/json',
+          'Accept-Language' => 'en_US',
+          'Authorization' => "Bearer #{token}"
+        })
+
+        response = http.request(request)
+        JSON.parse(response.body)['client_token']
+      rescue Net::OpenTimeout, Net::ReadTimeout, SocketError, JSON::ParserError, Errno::ECONNREFUSED => e
+        Rails.logger.warn("[spree_paypal_checkout] client token generation failed: #{e.message}")
+        nil
+      end
+
+      def api_base
+        preferred_test_mode ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com'
       end
     end
   end

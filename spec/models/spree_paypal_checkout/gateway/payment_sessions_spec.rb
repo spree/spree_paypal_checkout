@@ -37,6 +37,7 @@ RSpec.describe SpreePaypalCheckout::Gateway::PaymentSessions do
       orders_api = double
       allow(gateway).to receive(:client).and_return(double(orders: orders_api))
       allow(orders_api).to receive(:create_order).and_return(paypal_response)
+      allow(gateway).to receive(:generate_client_token).and_return('test-client-token')
     end
 
     it 'creates a payment session record' do
@@ -55,6 +56,21 @@ RSpec.describe SpreePaypalCheckout::Gateway::PaymentSessions do
       expect(session.status).to eq('pending')
       expect(session.order).to eq(order)
       expect(session.payment_method).to eq(gateway)
+    end
+
+    it 'stores a client token for Card Fields in external_data' do
+      session = gateway.create_payment_session(order: order)
+      expect(session.external_data['client_token']).to eq('test-client-token')
+    end
+
+    context 'when the client token cannot be generated' do
+      before { allow(gateway).to receive(:generate_client_token).and_return(nil) }
+
+      it 'still creates the session without a client token' do
+        session = gateway.create_payment_session(order: order)
+        expect(session).to be_a(Spree::PaymentSessions::PaypalCheckout)
+        expect(session.external_data).not_to have_key('client_token')
+      end
     end
 
     context 'when amount is zero' do

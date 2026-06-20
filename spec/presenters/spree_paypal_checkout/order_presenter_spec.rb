@@ -121,4 +121,51 @@ RSpec.describe SpreePaypalCheckout::OrderPresenter do
       end
     end
   end
+
+  context "provided shipping address (storefront owns the address)" do
+    let(:line_item) {
+      item = build_stubbed(:line_item)
+      allow(item).to receive(:name).and_return("Item")
+      item
+    }
+
+    def body
+      subject.to_json['body']
+    end
+
+    context "when the order has a ship address" do
+      let(:ship_address) { build_stubbed(:address) }
+      before { allow(order).to receive(:ship_address).and_return(ship_address) }
+
+      it "sends the storefront-collected address to PayPal" do
+        address = body.purchase_units[0].shipping.address
+        expect(address.address_line_1).to eq(ship_address.address1)
+        expect(address.admin_area_2).to eq(ship_address.city)
+        expect(address.postal_code).to eq(ship_address.zipcode)
+        expect(address.country_code).to eq(ship_address.country.iso)
+      end
+
+      it "names the recipient from the address" do
+        expect(body.purchase_units[0].shipping.name.full_name).to eq(ship_address.full_name)
+      end
+
+      it "pins the address so the PayPal wallet does not re-collect it" do
+        expect(body.payment_source.paypal.experience_context.shipping_preference)
+          .to eq(PaypalServerSdk::ShippingPreference::SET_PROVIDED_ADDRESS)
+      end
+    end
+
+    context "when the order has no ship address (e.g. digital-only)" do
+      before { allow(order).to receive(:ship_address).and_return(nil) }
+
+      it "omits the shipping block" do
+        expect(body.purchase_units[0].shipping).to be_nil
+      end
+
+      it "disables the PayPal shipping step entirely" do
+        expect(body.payment_source.paypal.experience_context.shipping_preference)
+          .to eq(PaypalServerSdk::ShippingPreference::NO_SHIPPING)
+      end
+    end
+  end
 end
