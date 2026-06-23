@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'spree', spree_opts
   s.add_dependency 'spree_admin', spree_opts
 
-  s.add_dependency 'paypal-server-sdk', '~> 1.1'
+  s.add_dependency 'paypal-server-sdk', '>= 1.1', '< 3.0'
 
   s.add_development_dependency 'dotenv'
   s.add_development_dependency 'spree_dev_tools'
