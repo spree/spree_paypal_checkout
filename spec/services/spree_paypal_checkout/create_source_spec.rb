@@ -43,6 +43,17 @@ RSpec.describe SpreePaypalCheckout::CreateSource do
       expect { subject }.not_to change(SpreePaypalCheckout::PaymentSources::Paypal, :count)
     end
 
+    context 'when the same PayPal account was used with a different gateway' do
+      let(:other_gateway) { create(:paypal_checkout_gateway, stores: [store]) }
+
+      before { described_class.new(paypal_payment_source: paypal_payment_source, gateway: other_gateway, order: order).call }
+
+      it 'creates a separate source for this gateway' do
+        expect { subject }.to change(SpreePaypalCheckout::PaymentSources::Paypal, :count).by(1)
+        expect(subject.payment_method).to eq(gateway)
+      end
+    end
+
     context 'when guest checks out then signs in' do
       let(:guest_order) { create(:order_with_line_items, store: store, user: nil) }
 
