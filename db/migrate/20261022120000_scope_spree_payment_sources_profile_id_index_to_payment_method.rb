@@ -2,7 +2,7 @@ class ScopeSpreePaymentSourcesProfileIdIndexToPaymentMethod < ActiveRecord::Migr
   def change
     remove_index :spree_payment_sources, [:type, :gateway_payment_profile_id],
                  unique: true, if_exists: true, name: 'index_payment_sources_on_type_and_gateway_payment_profile_id'
-    add_index :spree_payment_sources, [:type, :payment_method_id, :gateway_payment_profile_id],
-              unique: true, if_not_exists: true, name: 'index_payment_sources_on_type_payment_method_and_profile_id'
+    add_index :spree_payment_sources, [:type, :gateway_payment_profile_id, :payment_method_id],
+              unique: true, if_not_exists: true, name: 'index_payment_sources_on_type_profile_id_and_payment_method'
   end
 end
