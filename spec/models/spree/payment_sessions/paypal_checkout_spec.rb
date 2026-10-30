@@ -114,6 +114,19 @@ RSpec.describe Spree::PaymentSessions::PaypalCheckout do
       end
     end
 
+    context 'when the same PayPal account was used with a different payment method' do
+      let(:other_gateway) { create(:paypal_checkout_gateway, stores: [store]) }
+      let(:other_order) { create(:order_with_line_items, store: store, user: user) }
+      let(:other_session) { create(:paypal_checkout_payment_session, order: other_order, payment_method: other_gateway, external_data: captured_data) }
+
+      it 'creates a separate payment source for this payment method' do
+        other_payment = other_session.find_or_create_payment!
+        payment = session.find_or_create_payment!
+        expect(payment.source.payment_method).to eq(gateway)
+        expect(payment.source).not_to eq(other_payment.source)
+      end
+    end
+
     context 'when payment_source data is not present' do
       let(:session) { create(:paypal_checkout_payment_session, order: order, payment_method: gateway, external_data: captured_data.except('payment_source')) }
 
