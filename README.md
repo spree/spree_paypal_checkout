@@ -1,8 +1,13 @@
-# Spree PayPal Checkout
+> [!CAUTION]
+> This is a repository of the **Spree 5 version** of the PayPal payment gateway.
+>
+> **Spree 6 version** was moved to [Spree monorepo](https://github.com/spree/spree/tree/main/spree/providers/paypal).
+> 
+> Please submit pull requests and issues there.
+
+# Spree PayPal Checkout for Spree 5
 
 This is the official PayPal Checkout extension for [Spree Commerce](https://spreecommerce.org).
-
-This PayPal Checkout integration is bundled in the [Spree Starter](https://github.com/spree/spree_starter/) for your development convenience.
 
 Or you could follow the [installation instructions](https://spreecommerce.org/docs/integrations/payments/paypal).
 
